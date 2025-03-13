@@ -1,0 +1,40 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  name    String
+  password  String
+  videos  Video[]
+  likedVides  Like[]
+}
+
+model Video {
+  id      Int      @id @default(autoincrement())
+  title   String
+  url     String
+  createdBy Int
+  description  String?
+  likes   Like[]
+  
+  user User  @relation(fields: [createdBy], references: [id])
+}
+
+model Like{
+  id      Int      @id @default(autoincrement())
+  videoId Int
+  userId  Int
+
+  user User  @relation(fields: [userId], references: [id])
+  video Video  @relation(fields: [videoId], references: [id])
+
+  @@unique([videoId,userId])
+}
